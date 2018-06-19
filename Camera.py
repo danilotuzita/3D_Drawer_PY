@@ -7,6 +7,8 @@ UP = 101
 DOWN = 103
 LEFT = 100
 RIGHT = 102
+CTRL = 114
+SHIFT = 112
 
 
 class Camera(object):
@@ -40,35 +42,33 @@ class Camera(object):
         self.lookX = self.eyeX
         self.lookY = self.eyeY
         self.lookZ = self.eyeZ
-        tpitch = self.pitch * math.pi / 180
-        tyaw = self.yaw * math.pi / 180
+        tempPitch = self.pitch * math.pi / 180
+        tempYaw = self.yaw * math.pi / 180
 
-        self.lookY += math.asin(tpitch)
-        self.lookX += math.asin(tyaw)
-        self.lookZ += math.acos(tyaw)
+        self.lookY += math.sin(tempPitch)
+        self.lookX += math.sin(tempYaw)
+        self.lookZ += math.cos(tempYaw)
         self.lookAt()
 
     def handleLook(self, key):
-        # TODO: FIX SIN / COS
-        tyaw = self.yaw * math.pi / 180
+        tempYaw = self.yaw * math.pi / 180
         strafeYaw = (self.yaw + 90) * math.pi / 180
         if key == b'w':
-            self.eyeX += self.speed * math.asin(tyaw)
-            self.eyeZ += self.speed * math.acos(tyaw)
+            self.eyeX += self.speed * math.sin(tempYaw)
+            self.eyeZ += self.speed * math.cos(tempYaw)
         if key == b's':
-            self.eyeX -= self.speed * math.asin(tyaw)
-            self.eyeZ -= self.speed * math.acos(tyaw)
+            self.eyeX -= self.speed * math.sin(tempYaw)
+            self.eyeZ -= self.speed * math.cos(tempYaw)
         if key == b'a':
-            self.eyeX += self.speed * math.asin(strafeYaw)
-            self.eyeZ += self.speed * math.acos(strafeYaw)
+            self.eyeX += self.speed * math.sin(strafeYaw)
+            self.eyeZ += self.speed * math.cos(strafeYaw)
         if key == b'd':
-            self.eyeX -= self.speed * math.asin(strafeYaw)
-            self.eyeZ -= self.speed * math.acos(strafeYaw)
+            self.eyeX -= self.speed * math.sin(strafeYaw)
+            self.eyeZ -= self.speed * math.cos(strafeYaw)
 
         self.look()
 
     def handleEye(self, key):
-        # TODO: FIX SIN / COS
         if key == UP:
             self.pitch += 3
             if self.pitch >= 90:
@@ -81,5 +81,9 @@ class Camera(object):
             self.yaw += 3
         if key == RIGHT:
             self.yaw -= 3
+        if key == CTRL:
+            self.eyeY -= self.speed
+        if key == SHIFT:
+            self.eyeY += self.speed
 
         self.look()

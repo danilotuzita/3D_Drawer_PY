@@ -1,6 +1,4 @@
-import Camera
-import Mouse
-import Util
+import Camera, Mouse, Util, Light
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -39,6 +37,14 @@ def draw():
     glClear(GL_COLOR_BUFFER_BIT)
     handleViewParameters()
     Util.drawAxys()
+    Util.cube(0, 20, 0)
+    # glutSolidCube(50)
+
+    one = Util.red
+    two = Util.green
+    Util.cube(0, 150, 0, 1, 1, 1, one)
+    Util.cube(0, 90, 90, 1, 1, 1, two)
+
     mouse.draw()
     glutSwapBuffers()
 
@@ -48,6 +54,21 @@ def init():
     handleViewParameters()
     glClearColor(0.2, 0.2, 0.2, 1.0)
     mouse.setWindowSize(height, width)
+    Light.setupLighting()
+
+
+def handleWindowSize(w, h):
+    global height, width
+    if h == 0:
+        h = 1
+
+    glViewport(0, 0, w, h)
+
+    camera.fAspect = w / h
+    mouse.setWindowSize(h, w)
+    height = h
+    width = w
+    handleViewParameters()
 
 
 def handleMouseButtons(button, state, x, y):
@@ -108,6 +129,8 @@ def handleKeyboard(key, x, y):
         mouse.undo()  # desfaz a ultima curva desenhada
     if key == b'w' or key == b'a' or key == b's' or key == b'd':  # se w|a|s|d manda movimento para a camera
         camera.handleLook(key)
+    if b'1' <= key <= b'8':
+        Light.toggleLight(int(key)-1)
 
     glutPostRedisplay()
 
@@ -129,6 +152,7 @@ def main():
     glutInitWindowPosition(600, 0)
     glutInitWindowSize(width, height)
     glutCreateWindow(b"PROJETO CG - DANILO TUZITA | LUCAS CONTE | MARCOS AUGUSTO")
+    glutReshapeFunc(handleWindowSize)
 
     glutDisplayFunc(draw)
 
