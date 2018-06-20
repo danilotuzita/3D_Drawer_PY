@@ -1,9 +1,17 @@
 from OpenGL.GL import *
+from OpenGL.GLUT import *
 from collections import namedtuple
+
+import Light
+
+# defines
+LIGHT_SCALE = 0.25
 
 # define namedtuples
 XYZ = namedtuple("XYZ", ['x', 'y', 'z'])
 Color = namedtuple("Color", ['r', 'g', 'b'])
+L = Light.Light
+P = Light.Pos
 
 # define colors
 white = Color(1.0, 1.0, 1.0)
@@ -11,50 +19,59 @@ red   = Color(1.0, 0.0, 0.0)
 green = Color(0.0, 1.0, 0.0)
 blue  = Color(0.0, 0.0, 1.0)
 
-cubeVertices = (
-    XYZ( 1, -1, -1),  # 0
-    XYZ( 1,  1, -1),  # 1
-    XYZ(-1,  1, -1),  # 2
-    XYZ(-1, -1, -1),  # 3
-    XYZ( 1, -1,  1),  # 4
-    XYZ( 1,  1,  1),  # 5
-    XYZ(-1, -1,  1),  # 6
-    XYZ(-1,  1,  1)   # 7
-)
-
-cubeEdges = (
-    (0, 1, 2),
-    (0, 2, 3),
-    (0, 3, 4),
-    (3, 4, 6),
-    (0, 1, 4),
-    (1, 4, 5),
-    (1, 2, 5),
-    (2, 5, 7),
-    (2, 3, 6),
-    (2, 6, 7),
-    (4, 6, 7),
-    (4, 5, 7)
-)
+# lights
+lightsPos = list()
+lightsColor = list()
 
 
-def cube(posX=0, posY=0, posZ=0, scaleX=10, scaleY=10, scaleZ=10, color=white):
-    glBegin(GL_TRIANGLES)
-    # colors=(white, green, blue, red)
-    # i = 0
+def box(posX=0, posY=0, posZ=0, scaleX=1, scaleY=1, scaleZ=1, color=white):
     glColor(color)
-    for edge in cubeEdges:
-        # if i > 3:
-        #     i = 0
-        # glColor(colors[i])
-        # i+=1
-        for vertex in edge:
-            glVertex3fv(XYZ(
-                cubeVertices[vertex].x * scaleX + posX,
-                cubeVertices[vertex].y * scaleY + posY,
-                cubeVertices[vertex].z * scaleZ + posZ
-            ))
+    glPushMatrix()
+    glScalef(scaleX * 10, scaleY * 10, scaleZ * 10)
+    # o translate é dividido pela escala para garantir consistencia no translate
+    glTranslatef((posX / 10) / scaleX, (posY / 10) / scaleY, (posZ / 10) / scaleZ)
+    glutSolidCube(1)
+    glPopMatrix()
+
+
+def sphere(posX=0, posY=0, posZ=0, scaleX=1, scaleY=1, scaleZ=1, color=white, quality=16):
+    glColor(color)
+    glPushMatrix()
+    glScalef(scaleX * 10, scaleY * 10, scaleZ * 10)
+    glTranslatef((posX / 10) / scaleX, (posY / 10) / scaleY, (posZ / 10) / scaleZ)
+    glutSolidSphere(1, quality, quality)
+    glPopMatrix()
+
+
+def cylinder(posX=0, posY=0, posZ=0, scaleX=1, scaleY=1, scaleZ=1, color=white, quality=8):
+    glColor(color)
+    glPushMatrix()
+    glRotatef(-90, 1, 0, 0)
+    glScalef(scaleX, scaleZ, scaleY)
+    glTranslatef((posX / 10) / scaleX, (posY / 10) / scaleY, (posZ / 10) / scaleZ)
+    glutSolidCylinder(1, 1, quality, 1)
+    glPopMatrix()
+
+
+def line(x0=0, y0=0, z0=0, x1=0, y1=1, z1=0, color=white, width=1):
+    glLineWidth(width)
+    glBegin(GL_LINES)
+    glColor(color)
+    glVertex3f(x0, y0, z0)
+    glVertex3f(x1, y1, z1)
     glEnd()
+
+
+def drawLights():
+    global LIGHT_SCALE
+    for i in range(len(lightsPos)):
+        sphere(lightsPos[i].x, lightsPos[i].y, lightsPos[i].z, LIGHT_SCALE, LIGHT_SCALE, LIGHT_SCALE, lightsColor[i], 8)
+
+
+def addLight(pos=P(0, 0, 0, 1), ambient=L(1, 1, 1, 1), diffuse=L(1, 1, 1, 1), specular=L(1, 1, 1, 1), on=True):
+    lightsPos.append(pos)
+    lightsColor.append(Color(diffuse.r, diffuse.g, diffuse.b))
+    Light.createLight(pos, ambient, diffuse, specular, on)
 
 
 def drawAxys():

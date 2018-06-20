@@ -1,6 +1,7 @@
-import Util
 from collections import namedtuple
 from OpenGL.GL import *
+
+import Util
 
 Pos = namedtuple("Pos", ['x', 'y', 'z', 'inf'])
 Color = namedtuple("Color", ['r', 'g', 'b'])
@@ -11,24 +12,25 @@ LIGHTS = (GL_LIGHT0, GL_LIGHT1, GL_LIGHT2, GL_LIGHT3, GL_LIGHT4, GL_LIGHT5, GL_L
 count = -1  # guarda as luzes criadas
 
 # define lights   # tipos das listas
-lights = list()   # LightStatus
+lights = list()   # bool (on/off)
 ambient = list()  # Light
 diffuse = list()  # Light
 specular = list() # Light
 positions = list()# Pos
 
-specularity = Light(0.9, 0.9, 0.9, 1)
-matSpecularity = 1
+AMBIENT = Light(0.1, 0.1, 0.1, 1.0)
+SPECULARITY = Light(1.0, 1.0, 1.0, 1.0)
+matSpecularity = 128
 
 
-def createLight(amb, dif, spec, pos, on=True):
+def createLight(pos, amb, dif, spec, on=True):
     global count
     count += 1
+    positions.append(pos)
     lights.append(on)
     ambient.append(amb)
     diffuse.append(dif)
     specular.append(spec)
-    positions.append(pos)
 
 
 def handleLighting():
@@ -42,42 +44,47 @@ def handleLighting():
             glEnable(LIGHTS[i])
 
 
+def prepareLighting():
+    glShadeModel(GL_SMOOTH)  # Habilita o modelo de colorização de Gouraud
+    glMaterialfv(GL_FRONT, GL_SPECULAR, SPECULARITY)  # Define a refletância do material
+    glMateriali(GL_FRONT, GL_SHININESS, matSpecularity)  # Define a concentração do brilho
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, AMBIENT)  # Ativa o uso da luz ambiente
+    glEnable(GL_COLOR_MATERIAL)  # Habilita a definição da cor do material a partir da cor corrente
+    glEnable(GL_LIGHTING)  # Habilita o uso de iluminação
+    glEnable(GL_DEPTH_TEST)  # Habilita o depth-buffering
+
+
 def setupLighting():
-    createLight(
-        Light(0.2, 0.2, 0.2, 1),
-        Light(0.7, 0.7, 0.7, 1),
-        Light(0.1, 0.1, 0.1, 1),
-        Pos(0.0, 150.0, 0.0, 1)
+    Util.addLight(
+        Pos(0.0, 150.0, 0.0, 1.0),  # position
+        Light(0.2, 0.2, 0.2, 1.0),  # ambient
+        Light(0.7, 0.7, 0.7, 1.0),  # diffuse
+        Light(1.0, 1.0, 1.0, 1.0)  # specular
     )
-    createLight(
-        Light(0.0, 0.0, 0.0, 1),
-        Light(0.3, 0.8, 0.2, 1),
+    Util.addLight(
+        Pos(0.0, 10.0, 10.0, 1),
+        Light(0.2, 0.2, 0.2, 1),
+        Light(0.3, 0.6, 0.2, 1),
         Light(0.5, 0.5, 0.5, 1),
-        Pos(0.0, 90.0, 90.0, 1),
         False
     )
 
-    glMaterialfv(GL_FRONT, GL_SPECULAR, specularity)  # Define a refletância do material
-    glMateriali(GL_FRONT, GL_SHININESS, matSpecularity)  # Define a concentração do brilho
-    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient)  # Ativa o uso da luz ambiente
-    glEnable(GL_COLOR_MATERIAL) # Habilita a definição da cor do material a partir da cor corrente
-    glEnable(GL_LIGHTING)       # Habilita o uso de iluminação
-    glEnable(GL_DEPTH_TEST)     # Habilita o depth-buffering
-    glShadeModel(GL_SMOOTH)     # Habilita o modelo de colorização de Gouraud
+    prepareLighting()
     handleLighting()
 
 
 def disableLight(light):
-    if light <= len(lights):
-        glDisable(LIGHTS[light])
+    glDisable(LIGHTS[light])
 
 
 def enableLight(light):
-    if light <= len(lights):
-        glEnable(LIGHTS[light])
+    glEnable(LIGHTS[light])
 
 
 def toggleLight(light):
+    if light >= len(lights):
+        return
+
     if lights[light]:
         disableLight(light)
         lights[light] = False

@@ -46,6 +46,7 @@ class Mouse(object):
     def draw(self):
         # print(len(self.xy))
         # configura o openGL para desenhar em 2D
+        glDisable(GL_LIGHTING)
         glMatrixMode(GL_PROJECTION)
         glPushMatrix()
         glLoadIdentity()
@@ -64,13 +65,14 @@ class Mouse(object):
             if self.xy[i].x and self.xy[i - 1].x:  # se não for um 'break' de curvas
                 # para desenhar uma linha precisa de 2 pontos:
                 glVertex2d(self.xy[i - 1].x, self.xy[i - 1].y)  # o 'anterior'
-                glVertex2d(self.xy[i].x, self.xy[i].y)  # e o 'atual'
+                glVertex2d(self.xy[i].x, self.xy[i].y)          # e o 'atual'
             i += 1
         glEnd()
 
         glMatrixMode(GL_PROJECTION)
         glPopMatrix()
         glMatrixMode(GL_MODELVIEW)
+        glEnable(GL_LIGHTING)
 
     def undo(self):
         if not self.z:  # não é possivel fazer pop_back com vetor z vazio

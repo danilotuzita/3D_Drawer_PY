@@ -37,13 +37,14 @@ def draw():
     glClear(GL_COLOR_BUFFER_BIT)
     handleViewParameters()
     Util.drawAxys()
-    Util.cube(0, 20, 0)
-    # glutSolidCube(50)
 
-    one = Util.red
-    two = Util.green
-    Util.cube(0, 150, 0, 1, 1, 1, one)
-    Util.cube(0, 90, 90, 1, 1, 1, two)
+    Util.line(5, 0, 0, 5, 10, 0)
+    Util.cylinder(0, 0, 0, 1, 90, 1, Util.red, 4)
+    Util.box(0, 90, 0, 2, 2, 2)
+    Util.line(0, 90, 0, 25, 90, 0, Util.white, 3)
+    Util.sphere(25, 90, 0, 1.25, 1.25, 1.25, Util.green)
+
+    Util.drawLights()
 
     mouse.draw()
     glutSwapBuffers()
@@ -129,7 +130,7 @@ def handleKeyboard(key, x, y):
         mouse.undo()  # desfaz a ultima curva desenhada
     if key == b'w' or key == b'a' or key == b's' or key == b'd':  # se w|a|s|d manda movimento para a camera
         camera.handleLook(key)
-    if b'1' <= key <= b'8':
+    if b'1' <= key <= b'8':  # numeros de 1 a 8
         Light.toggleLight(int(key)-1)
 
     glutPostRedisplay()
