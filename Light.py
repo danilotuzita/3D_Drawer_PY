@@ -18,9 +18,9 @@ diffuse = list()  # Light
 specular = list() # Light
 positions = list()# Pos
 
-AMBIENT = Light(0.1, 0.1, 0.1, 1.0)
+AMBIENT = Light(0.1, 0.1, 0.1, 0.5)
 SPECULARITY = Light(1.0, 1.0, 1.0, 1.0)
-matSpecularity = 128
+matSpecularity = 64
 
 
 def createLight(pos, amb, dif, spec, on=True):
@@ -57,17 +57,33 @@ def prepareLighting():
 def setupLighting():
     Util.addLight(
         Pos(0.0, 150.0, 0.0, 1.0),  # position
-        Light(0.2, 0.2, 0.2, 1.0),  # ambient
-        Light(0.7, 0.7, 0.7, 1.0),  # diffuse
-        Light(1.0, 1.0, 1.0, 1.0)  # specular
+        Light(0.4, 0.4, 0.4, 1.0),  # ambient
+        Light(0.5, 0.5, 0.5, 1.0),  # diffuse
+        Light(0.1, 0.1, 0.1, 1.0)  # specular
     )
     Util.addLight(
-        Pos(0.0, 10.0, 10.0, 1),
-        Light(0.2, 0.2, 0.2, 1),
-        Light(0.3, 0.6, 0.2, 1),
-        Light(0.5, 0.5, 0.5, 1),
+        Pos(35.0, 50.0, 0.0, 1),
+        Light(0.8, 0.4, 0.4, 1),
+        Light(1.0, 0.2, 0.2, 1),
+        Light(0.9, 0.3, 0.3, 1),
         False
     )
+    Util.addLight(
+        Pos(-35.0, 50.0, -35.0, 1),
+        Light(0.4, 0.8, 0.4, 1),
+        Light(0.2, 1.0, 0.2, 1),
+        Light(0.3, 0.9, 0.3, 1),
+        False
+    )
+    Util.addLight(
+        Pos(-35.0, 50.0, 35.0, 1),
+        Light(0.4, 0.4, 0.8, 1),
+        Light(0.2, 0.2, 1.0, 1),
+        Light(0.3, 0.3, 0.9, 1),
+        False
+    )
+
+
 
     prepareLighting()
     handleLighting()

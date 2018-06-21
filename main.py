@@ -2,7 +2,7 @@ import Camera, Mouse, Util, Light
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-
+import pygame
 import time
 
 # keyboard defines
@@ -23,6 +23,21 @@ start = 0  # controla o tempo do click do mouse
 width = 800
 height = 600
 
+# texture
+img = pygame.image.load('texture/tex.jpg')
+texData = pygame.image.tostring(img, "RGBA", 1)
+texWidth = img.get_width()
+texHeight = img.get_height()
+texId = 0
+
+# objects
+objects = list()
+SIZE = (
+    10,  # Util.BOX     = 0
+    1,   # Util.SPHERE  = 1
+    10   # Util.PYRAMID = 2
+)
+
 
 def handleViewParameters():
     glMatrixMode(GL_PROJECTION)
@@ -33,19 +48,25 @@ def handleViewParameters():
     camera.look()
 
 
+def texture():
+    global texId
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+    texId = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, texId)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texWidth, texHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+
+
 def draw():
-    glClear(GL_COLOR_BUFFER_BIT)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     handleViewParameters()
     Util.drawAxys()
-
-    Util.line(5, 0, 0, 5, 10, 0)
-    Util.cylinder(0, 0, 0, 1, 90, 1, Util.red, 4)
-    Util.box(0, 90, 0, 2, 2, 2)
-    Util.line(0, 90, 0, 25, 90, 0, Util.white, 3)
-    Util.sphere(25, 90, 0, 1.25, 1.25, 1.25, Util.green)
-
-    Util.drawLights()
-
+    for obj in objects:
+        Util.drawObj(obj)
+    # Util.drawLights()
     mouse.draw()
     glutSwapBuffers()
 
@@ -56,6 +77,7 @@ def init():
     glClearColor(0.2, 0.2, 0.2, 1.0)
     mouse.setWindowSize(height, width)
     Light.setupLighting()
+    texture()
 
 
 def handleWindowSize(w, h):
@@ -126,6 +148,9 @@ def handleKeyboard(key, x, y):
         exit()
     if key == b' ':
         mouse.reset()  # limpa o desenho do mouse
+        tipo = Util.SPHERE  # função do augusto retorna o tipo
+        xyz = camera.returnDist(100)
+        objects.append(Util.OBJ(tipo, xyz[0], xyz[1], xyz[2], SIZE[tipo], SIZE[tipo], SIZE[tipo], texId))
     if key == b'z':
         mouse.undo()  # desfaz a ultima curva desenhada
     if key == b'w' or key == b'a' or key == b's' or key == b'd':  # se w|a|s|d manda movimento para a camera
@@ -137,7 +162,6 @@ def handleKeyboard(key, x, y):
 
 
 def handleSKeyboard(key, x, y):
-    # print(str(key))
     camera.handleEye(key)  # se setinhas manda o movimento para a camera
     glutPostRedisplay()
 

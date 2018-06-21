@@ -13,13 +13,13 @@ SHIFT = 112
 
 class Camera(object):
     def __init__(self):
-        self.yaw = -25
+        self.yaw = -135
         self.pitch = 0
         self.speed = 3
 
-        self.eyeX = 25
+        self.eyeX = 100
         self.eyeY = 25
-        self.eyeZ = -100
+        self.eyeZ = 100
 
         self.lookX = 0
         self.lookY = 0
@@ -87,3 +87,15 @@ class Camera(object):
             self.eyeY += self.speed
 
         self.look()
+
+    def returnDist(self, dist=30):
+        lookX = self.eyeX
+        lookY = self.eyeY
+        lookZ = self.eyeZ
+        tempPitch = self.pitch * math.pi / 180
+        tempYaw = self.yaw * math.pi / 180
+
+        lookY += math.sin(tempPitch)*dist
+        lookX += math.sin(tempYaw)*dist
+        lookZ += math.cos(tempYaw)*dist
+        return lookX, lookY, lookZ

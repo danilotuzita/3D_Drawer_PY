@@ -43,8 +43,7 @@ class Mouse(object):
         self.height = h
         self.width = w
 
-    def draw(self):
-        # print(len(self.xy))
+    def draw(self, r=1, g=1, b=1, w=1.5, line=True):
         # configura o openGL para desenhar em 2D
         glDisable(GL_LIGHTING)
         glMatrixMode(GL_PROJECTION)
@@ -53,20 +52,24 @@ class Mouse(object):
         gluOrtho2D(0, self.width, 0, self.height)
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
-
         glClear(GL_DEPTH_BUFFER_BIT)
 
         # desenhando o 'caminho' do mouse
-        glColor3f(1.0, 1.0, 1.0)
-        glLineWidth(1.5)
-        glBegin(GL_LINES)
-        i = 1
-        while i < len(self.xy):
+        glColor3f(r, g, b)
+
+        if line:
+            glLineWidth(w)
+            glBegin(GL_LINES)
+        else:
+            glPointSize(w)
+            glBegin(GL_POINTS)
+
+        for i in range(1, len(self.xy)):
             if self.xy[i].x and self.xy[i - 1].x:  # se não for um 'break' de curvas
-                # para desenhar uma linha precisa de 2 pontos:
-                glVertex2d(self.xy[i - 1].x, self.xy[i - 1].y)  # o 'anterior'
-                glVertex2d(self.xy[i].x, self.xy[i].y)          # e o 'atual'
-            i += 1
+                if line:  # para desenhar uma linha precisa de 2 pontos:
+                    glVertex2d(self.xy[i - 1].x, self.xy[i - 1].y)  # o 'anterior'
+                glVertex2d(self.xy[i].x, self.xy[i].y)              # e o 'atual'
+
         glEnd()
 
         glMatrixMode(GL_PROJECTION)
