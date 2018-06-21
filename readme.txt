@@ -5,6 +5,9 @@ Como configurar 3D Drawer:
 	- Pesquisar por PyOpenGL
 	- Selecionar PyOpenGL
 	- >Install Package
+	- Pesquisar por Pygame
+	- Selecionar Pygame
+	- >Install Package
    - Verificar se freeglut.dll está na pasta do main.py
     - Se não estiver, baixar em: https://www.transmissionzero.co.uk/software/freeglut-devel/
 	 - versão que eu baixei 'freeglut 3.0.0 MSVC Package'
